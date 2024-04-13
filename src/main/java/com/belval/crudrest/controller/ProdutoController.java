@@ -66,7 +66,8 @@ public class ProdutoController {
 	
 	@DeleteMapping("/produtos/{id}")
 	public ResponseEntity<Object> apagarProduto(
-			@PathVariable(value == "id") Interger id){
+			@PathVariable(value = "id") Integer id){
+		return null;
 		
 	}
 	

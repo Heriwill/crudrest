@@ -42,7 +42,7 @@ public class ProdutoController {
 	public ResponseEntity<Produto> criarProduto(@RequestBody Produto produto) {
 		
 		repository.add(produto);
-		
+		 
 		return ResponseEntity
 				.status(HttpStatus.CREATED)
 				.body(produto);
@@ -64,12 +64,33 @@ public class ProdutoController {
 				.body(produto);
 	}
 	
+	/*
 	@DeleteMapping("/produtos/{id}")
 	public ResponseEntity<Object> apagarProduto(
 			@PathVariable(value = "id") Integer id){
-		return null;
-		
+		repository.removebyId(produtos);
+			return ResponseEntity
+					.status(HttpStatus.OK)
+					.body("Produto removido com sucesso!");
+					//terminar
+			//usar como referencia 
 	}
+	*/
 	
+	@DeleteMapping("/produtos/{id}")
+	public ResponseEntity<Object> apagar(@PathVariable Integer id){
+		if(repository.removeById(id)) {
+			return ResponseEntity
+					.status(HttpStatus.OK)
+					.body("Produto apagado com sucesso!");
+		}
+			else {
+				return ResponseEntity
+						.status(HttpStatus.NOT_FOUND)
+						.body("Produto não encontrado!");
+		}
 	
+	}
+
 }
+

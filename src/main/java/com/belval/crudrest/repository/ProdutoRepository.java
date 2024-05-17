@@ -56,15 +56,16 @@ public class ProdutoRepository {
 //	Criar método público removeById que remove o primeiro objeto Produto e 
 //	cujo o valor do atributo id é igual ao valor recebido como parâmetro
 	
-	public void removeById(Integer id) {
+	public boolean removeById(Integer id) {
 		Iterator<Produto> it = listaProdutos.iterator();
 		while(it.hasNext()) {
 			Produto p = it.next();
 			if (p.getId().equals(id)) {
 				it.remove();
-				return;
+				return true;
 			}
 		}
+		return false;
 	}
 
 	public void add(Produto produto) {

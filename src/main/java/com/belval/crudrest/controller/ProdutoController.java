@@ -2,6 +2,7 @@ package com.belval.crudrest.controller;
 
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -12,7 +13,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.belval.crudrest.model.Produto;
-import com.belval.crudrest.repository.ProdutoRepository;
+import com.belval.crudrest.repository.ProdutoRepository2;
 
 @RestController
 public class ProdutoController {
@@ -20,9 +21,11 @@ public class ProdutoController {
 //	private static List<Produto> listaProdutos = new ArrayList<>();
 //	private static Integer proxId = 1;
 	
-	private static ProdutoRepository repository = 
-			new ProdutoRepository();
+//	private static ProdutoRepository repository = 
+//			new ProdutoRepository();
 	
+	@Autowired      //injeta atributos nesse repositorio
+	private ProdutoRepository2 repository;
 
 	static {
 //		Produto prod = new Produto(1, "Pão", "Pão Francês", 0.5);
@@ -30,7 +33,7 @@ public class ProdutoController {
 	}
 	
 	@GetMapping("/produtos")
-	public ResponseEntity<List<Produto>> obterProdutos() {
+	public ResponseEntity<Iterable<Produto>> obterProdutos() {
 		return ResponseEntity
 				.status(HttpStatus.OK)
 				.body(repository.findAll());
@@ -41,19 +44,19 @@ public class ProdutoController {
 	@PostMapping("/produtos")
 	public ResponseEntity<Produto> criarProduto(@RequestBody Produto produto) {
 		
-		repository.add(produto);
+		repository.save(produto);
 		 
 		return ResponseEntity
 				.status(HttpStatus.CREATED)
-				.body(produto);
+				.body(produto.get());
 	}
 	
 	@GetMapping("/produtos/{id}")
 	public ResponseEntity<Object> buscarProdutoPorId(@PathVariable Integer id) {
 		
-		Produto produto = repository.findById(id);
+		Optional<Produto> produto = repository.findById(id);
 		
-		if(produto == null) {
+		if(!produto.isPresent()) {     // ! é a negação
 			return ResponseEntity
 					.status(HttpStatus.NOT_FOUND)
 					.body("Produto não encontrado.");
@@ -79,16 +82,20 @@ public class ProdutoController {
 	
 	@DeleteMapping("/produtos/{id}")
 	public ResponseEntity<Object> apagar(@PathVariable Integer id){
-		if(repository.removeById(id)) {
+		
+	Optional<Produto> produto = repository.findById(id);
+		
+		if(!produto.isPresent()) {     // ! é a negação
 			return ResponseEntity
-					.status(HttpStatus.OK)
-					.body("Produto apagado com sucesso!");
+					.status(HttpStatus.NOT_FOUND)
+					.body("Produto não encontrado.");
 		}
-			else {
-				return ResponseEntity
-						.status(HttpStatus.NOT_FOUND)
-						.body("Produto não encontrado!");
-		}
+		repository.delete(produto.get())
+		
+		return ResponseEntity
+				.status(HttpStatus.OK)
+				.body("Produto apagado com sucesso!");
+		
 	
 	}
 

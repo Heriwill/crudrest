@@ -1,6 +1,6 @@
 package com.belval.crudrest.controller;
 
-import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -48,7 +49,7 @@ public class ProdutoController {
 		 
 		return ResponseEntity
 				.status(HttpStatus.CREATED)
-				.body(produto.get());
+				.body(produto);
 	}
 	
 	@GetMapping("/produtos/{id}")
@@ -80,6 +81,8 @@ public class ProdutoController {
 	}
 	*/
 	
+	// curl -X DELETE http://localhost:8080/produtos/id
+
 	@DeleteMapping("/produtos/{id}")
 	public ResponseEntity<Object> apagar(@PathVariable Integer id){
 		
@@ -90,7 +93,7 @@ public class ProdutoController {
 					.status(HttpStatus.NOT_FOUND)
 					.body("Produto não encontrado.");
 		}
-		repository.delete(produto.get())
+		repository.delete(produto.get());
 		
 		return ResponseEntity
 				.status(HttpStatus.OK)
@@ -98,6 +101,33 @@ public class ProdutoController {
 		
 	
 	}
-
+	
+	//ResponseEntity é a resposta http, ex: codigos de retorno como 'OK' '404' 'nao encontrado'etc.
+	//Put é o metodo de atualizacao
+	//  curl -X PUT http://localhost:8080/produtos/1 -H "Content-Type: application/json; Charset=utf-8" -d @produto-mortadela.json
+	//trocar id depois de /produtos/ 
+	@PutMapping("/produtos/{id}")
+	public ResponseEntity<Object> atualizarProduto(
+			@PathVariable(value = "id") Integer id,
+			@RequestBody Produto produto) {
+		
+		Optional<Produto>produtoEncontrado = repository.findById(id);
+		
+		//isEmpty é vazio
+		if (produtoEncontrado.isEmpty()) {
+			return ResponseEntity
+					.status(HttpStatus.NOT_FOUND)
+					.body("Produto não encontrado.");
+		}
+		
+		produto.setId(id);
+		repository.save(produto);
+		
+		return ResponseEntity
+				.status(HttpStatus.OK)
+				.body("Produto atualizado com sucesso.");
+		
+	}
+	
 }
 
